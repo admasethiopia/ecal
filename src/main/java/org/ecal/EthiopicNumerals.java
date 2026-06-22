@@ -1,83 +1,61 @@
 package org.ecal;
 
-import java.util.Map;
-
+/**
+ * Formats non-negative integers as Ge'ez (Ethiopic) numerals.
+ *
+ * <p>Ge'ez numerals are written in base-100 groups. Each two-digit group (1..99)
+ * is rendered from a tens glyph and a ones glyph, and the groups are separated by
+ * the place markers {@code ፻} (100) and {@code ፼} (10000). A group whose value is
+ * exactly one is written as the bare place marker (e.g. 100 is {@code ፻}, not
+ * {@code ፩፻}).
+ */
 public final class EthiopicNumerals {
-    private static final Map<String, String> DIGITS = Map.ofEntries(
-        Map.entry("1", "፩"),
-        Map.entry("2", "፪"),
-        Map.entry("3", "፫"),
-        Map.entry("4", "፬"),
-        Map.entry("5", "፭"),
-        Map.entry("6", "፮"),
-        Map.entry("7", "፯"),
-        Map.entry("8", "፰"),
-        Map.entry("9", "፱"),
-        Map.entry("10", "፲"),
-        Map.entry("20", "፳"),
-        Map.entry("30", "፴"),
-        Map.entry("40", "፵"),
-        Map.entry("50", "፶"),
-        Map.entry("60", "፷"),
-        Map.entry("70", "፸"),
-        Map.entry("80", "፹"),
-        Map.entry("90", "፺"),
-        Map.entry("100", "፻"),
-        Map.entry("10000", "፼")
-    );
+    private static final String[] ONES = {"", "፩", "፪", "፫", "፬", "፭", "፮", "፯", "፰", "፱"};
+    private static final String[] TENS = {"", "፲", "፳", "፴", "፵", "፶", "፷", "፸", "፹", "፺"};
+    private static final String HUNDRED = "፻";
+    private static final String TEN_THOUSAND = "፼";
 
     private EthiopicNumerals() {
     }
 
     public static String format(long value) {
         if (value == 0) {
+            // Ge'ez has no zero glyph; callers treat an empty string as "nothing to show".
             return "";
         }
         if (value < 0) {
             return "-" + format(-value);
         }
-        if (value < 10) {
-            return DIGITS.get(Long.toString(value));
-        }
-
-        String decimal = Long.toString(value);
-        StringBuilder groups = new StringBuilder();
-        int index = decimal.length() - 1;
-        int groupIndex = 0;
-
-        while (index > 0) {
-            int ones = decimal.charAt(index--) - '0';
-            int tens = decimal.charAt(index--) - '0';
-            StringBuilder group = new StringBuilder();
-            if (tens != 0) {
-                group.append('`').append(tens).append('0');
-            }
-            if (ones > 1 || ones == 1 && groupIndex == 0) {
-                group.append('`').append(ones);
-            }
-            if (groupIndex != 0) {
-                if (groupIndex % 2 != 0) {
-                    group.append("`100");
-                }
-                for (int i = 0; i < groupIndex / 2; i++) {
-                    group.append("`10000");
-                }
-            }
-            groups.insert(0, group).insert(0, ',');
-            groupIndex++;
-        }
 
         StringBuilder result = new StringBuilder();
-        for (String group : groups.toString().split(",")) {
-            if (group.isBlank()) {
-                continue;
+        int position = 0;
+        for (long remaining = value; remaining > 0; remaining /= 100) {
+            int group = (int) (remaining % 100);
+            if (group != 0) {
+                result.insert(0, groupDigits(group, position) + placeMarker(position));
             }
-            for (String token : group.split("`")) {
-                if (!token.isBlank()) {
-                    result.append(DIGITS.get(token));
-                }
-            }
+            position++;
         }
         return result.toString();
+    }
+
+    private static String groupDigits(int group, int position) {
+        if (group == 1 && position > 0) {
+            // The leading "one" before a place marker is implied (100 -> ፻, not ፩፻).
+            return "";
+        }
+        return TENS[group / 10] + ONES[group % 10];
+    }
+
+    private static String placeMarker(int position) {
+        if (position == 0) {
+            return "";
+        }
+        StringBuilder marker = new StringBuilder();
+        if (position % 2 == 1) {
+            marker.append(HUNDRED);
+        }
+        marker.append(TEN_THOUSAND.repeat(position / 2));
+        return marker.toString();
     }
 }

@@ -238,8 +238,8 @@ public final class EthiopianCalendarPanel extends JPanel {
             .append("\n\n");
 
         List<CalendarEvent> events = EventData.eventsFor(selectedDate);
-        if (!showAllEvents.isSelected() && !events.isEmpty()) {
-            events = List.of(events.get(0));
+        if (!showAllEvents.isSelected()) {
+            events = events.stream().filter(CalendarEvent::routine).toList();
         }
         for (CalendarEvent event : events) {
             text.append(event.category()).append(": ").append(event.title()).append('\n');

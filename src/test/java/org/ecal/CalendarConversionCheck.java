@@ -8,6 +8,10 @@ public final class CalendarConversionCheck {
     }
 
     public static void main(String[] args) {
+        run();
+    }
+
+    static void run() {
         checkKnownDates();
         checkRoundTrips();
         if (hasIcu4j()) {

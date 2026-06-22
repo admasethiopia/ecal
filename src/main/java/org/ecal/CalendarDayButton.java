@@ -11,7 +11,6 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 
@@ -62,8 +61,8 @@ final class CalendarDayButton extends JButton {
         this.ethiopianText = showEthiopicNumbers ? EthiopicNumerals.format(date.day()) : Integer.toString(date.day());
         LocalDate gregorian = date.toGregorian();
         this.gregorianText = showGregorian ? GREGORIAN_FORMAT.format(gregorian) : "";
-        List<CalendarEvent> events = EventData.eventsFor(date);
-        this.eventCount = showAllEvents ? Math.min(Math.max(events.size() - 1, 0), 4) : 0;
+        int notableCount = EventData.notableEventsFor(date).size();
+        this.eventCount = showAllEvents ? Math.min(notableCount, 4) : 0;
         setFont(Theme.ethiopicFont(dayFontSize, Font.PLAIN));
 
         if (selected) {

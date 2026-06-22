@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 final class EventData {
     private static final String[] MOVABLE_FASTS = {
@@ -110,6 +111,8 @@ final class EventData {
         "3/13", "ሩፋኤል"
     );
 
+    private static final Map<Long, Map<String, String>> MOVABLE_CACHE = new ConcurrentHashMap<>();
+
     private EventData() {
     }
 
@@ -119,26 +122,42 @@ final class EventData {
         int month = date.month();
         String monthDay = day + "/" + month;
 
+        // The monthly commemoration is the routine entry every day carries.
         if (month == 13) {
-            addIfPresent(events, "ወርኃዊ በዓል", day <= PAGUME_COMMUNAL.length ? PAGUME_COMMUNAL[day - 1] : null);
+            addIfPresent(events, "ወርኃዊ በዓል", day <= PAGUME_COMMUNAL.length ? PAGUME_COMMUNAL[day - 1] : null, true);
         } else {
-            addIfPresent(events, "ወርኃዊ በዓል", MONTHLY_COMMUNAL[day - 1]);
+            addIfPresent(events, "ወርኃዊ በዓል", MONTHLY_COMMUNAL[day - 1], true);
         }
 
-        addIfPresent(events, "ተንቀሳቃሽ በዓል/ጾም", movableEvents(date.year()).get(month + "/" + day + "/" + date.year()));
-        addIfPresent(events, "ጾም", FASTS.get(monthDay));
-        addIfPresent(events, "አመታዊ በዓል", FIXED_FEASTS.get(monthDay));
-        addIfPresent(events, "የኃዋሪያ/ወንጌላዊ በዓል", APOSTLES_AND_EVANGELISTS.get(monthDay));
-        addIfPresent(events, "የቅድስት ማርያም በዓል", MARIAN_FEASTS.get(monthDay));
-        addIfPresent(events, "የሊቃነ መላእክ እለት", ARCHANGELS.get(monthDay));
+        addIfPresent(events, "ተንቀሳቃሽ በዓል/ጾም", movableEvents(date.year()).get(month + "/" + day + "/" + date.year()), false);
+        addIfPresent(events, "ጾም", FASTS.get(monthDay), false);
+        addIfPresent(events, "አመታዊ በዓል", FIXED_FEASTS.get(monthDay), false);
+        addIfPresent(events, "የኃዋሪያ/ወንጌላዊ በዓል", APOSTLES_AND_EVANGELISTS.get(monthDay), false);
+        addIfPresent(events, "የቅድስት ማርያም በዓል", MARIAN_FEASTS.get(monthDay), false);
+        addIfPresent(events, "የሊቃነ መላእክ እለት", ARCHANGELS.get(monthDay), false);
         return events;
     }
 
-    static boolean hasEvents(EthiopianDate date) {
-        return eventsFor(date).size() > 1;
+    /** Notable feasts and fasts for the day, excluding the routine monthly commemoration. */
+    static List<CalendarEvent> notableEventsFor(EthiopianDate date) {
+        List<CalendarEvent> notable = new ArrayList<>();
+        for (CalendarEvent event : eventsFor(date)) {
+            if (!event.routine()) {
+                notable.add(event);
+            }
+        }
+        return notable;
     }
 
-    private static Map<String, String> movableEvents(long ethiopianYear) {
+    static boolean hasNotableEvents(EthiopianDate date) {
+        return !notableEventsFor(date).isEmpty();
+    }
+
+    static Map<String, String> movableEvents(long ethiopianYear) {
+        return MOVABLE_CACHE.computeIfAbsent(ethiopianYear, EventData::computeMovableEvents);
+    }
+
+    private static Map<String, String> computeMovableEvents(long ethiopianYear) {
         long ameteAlem = 5500L + ethiopianYear;
         long metonicRemainder = (ameteAlem - 1L) % 19L;
         long epact = metonicRemainder * 11L % 30L;
@@ -167,9 +186,9 @@ final class EventData {
         return events;
     }
 
-    private static void addIfPresent(List<CalendarEvent> events, String category, String value) {
+    private static void addIfPresent(List<CalendarEvent> events, String category, String value, boolean routine) {
         if (value != null && !value.isBlank()) {
-            events.add(new CalendarEvent(category, value));
+            events.add(new CalendarEvent(category, value, routine));
         }
     }
 

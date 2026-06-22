@@ -21,10 +21,10 @@ test: $(APP_JAR) $(TEST_SOURCES)
 	mkdir -p build/test-classes
 	if [ -f "$(ICU4J_JAR)" ]; then \
 		javac -cp build/clean-classes:$(ICU4J_JAR) -d build/test-classes $(TEST_SOURCES); \
-		java -cp build/clean-classes:build/test-classes:$(ICU4J_JAR) org.ecal.CalendarConversionCheck; \
+		java -cp build/clean-classes:build/test-classes:$(ICU4J_JAR) org.ecal.TestSuite; \
 	else \
 		javac -cp build/clean-classes -d build/test-classes $(TEST_SOURCES); \
-		java -cp build/clean-classes:build/test-classes org.ecal.CalendarConversionCheck; \
+		java -cp build/clean-classes:build/test-classes org.ecal.TestSuite; \
 	fi
 
 clean:
