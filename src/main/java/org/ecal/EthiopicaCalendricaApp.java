@@ -17,7 +17,8 @@ public final class EthiopicaCalendricaApp {
             frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
             frame.setLayout(new BorderLayout());
             frame.add(new EthiopianCalendarPanel(), BorderLayout.CENTER);
-            frame.setMinimumSize(new Dimension(900, 620));
+            frame.setMinimumSize(new Dimension(980, 680));
+            frame.setPreferredSize(new Dimension(1060, 740));
             frame.pack();
             frame.setLocationRelativeTo(null);
             frame.setVisible(true);

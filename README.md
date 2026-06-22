@@ -16,11 +16,24 @@ The runnable jar is written to:
 build/ecal-clean.jar
 ```
 
+The build downloads [FlatLaf](https://www.formdev.com/flatlaf/) (a Swing
+look-and-feel) into `tools/` on first run and bundles it into the jar, so the
+result stays a single self-contained runnable jar with no runtime dependencies.
+
 ## Run
 
 ```sh
 make run
 ```
+
+### Keyboard shortcuts
+
+- **Arrow keys** — move the selected day (when a day cell has focus)
+- **Page Up / Page Down** — previous / next month
+- **Home** — jump to today
+
+The UI controls are bilingual: Amharic labels with English tooltips. Calendar
+content (months, weekdays, numerals, events) is Amharic/Ge'ez.
 
 ## Notes
 

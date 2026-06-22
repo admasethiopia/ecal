@@ -1,5 +1,6 @@
 package org.ecal;
 
+import com.formdev.flatlaf.FlatLightLaf;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontFormatException;
@@ -7,19 +8,21 @@ import java.io.IOException;
 import java.io.InputStream;
 import javax.swing.BorderFactory;
 import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.Border;
 
 final class Theme {
     static final Color BACKGROUND = new Color(0xF7F5F0);
     static final Color SURFACE = Color.WHITE;
+    static final Color SURFACE_MUTED = new Color(0xF1EFEA);
     static final Color TEXT = new Color(0x202124);
     static final Color MUTED_TEXT = new Color(0x5F6368);
     static final Color BORDER = new Color(0xDADCE0);
     static final Color ACCENT = new Color(0x2F6F73);
     static final Color ACCENT_SOFT = new Color(0xDCEBEC);
     static final Color TODAY = new Color(0xB3261E);
+    static final Color TODAY_SOFT = new Color(0xFCEEEE);
     static final Color EVENT = new Color(0xB78103);
+    static final Color EVENT_SOFT = new Color(0xFFF8E1);
 
     static final Border CELL_BORDER = BorderFactory.createLineBorder(BORDER);
     private static Font ethiopicBaseFont;
@@ -30,11 +33,15 @@ final class Theme {
     static void installLookAndFeel() {
         System.setProperty("awt.useSystemAAFontSettings", "on");
         System.setProperty("swing.aatext", "true");
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ignored) {
-            // Keep Swing's cross-platform look and feel if the system look and feel is unavailable.
-        }
+        FlatLightLaf.setup();
+        // Tuned defaults for a softer, modern flat look.
+        UIManager.put("Component.accentColor", ACCENT);
+        UIManager.put("Button.arc", 999);
+        UIManager.put("Component.arc", 12);
+        UIManager.put("Component.focusWidth", 1);
+        UIManager.put("ScrollBar.width", 12);
+        UIManager.put("ScrollBar.thumbArc", 999);
+        UIManager.put("ToolBar.separatorColor", BORDER);
     }
 
     static Font uiFont(float size, int style) {
