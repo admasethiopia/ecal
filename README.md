@@ -103,16 +103,3 @@ Hand-rolled checks (no test framework), run from `org.ecal.TestSuite`:
 - `EcalCalendarSourceCheck` — the adapter: month normalisation, year clamping,
   day resolution across boundaries, and the feast/fast classification.
 - `GeezNumeralParityCheck` — the UI and domain numeral formatters agree.
-
-## Migration reference
-
-This app was migrated from a decompiled legacy jar, preserved at
-`reference/ec-original.jar` (gitignored) as the source of truth. The earlier
-`decompiled*/` directories are regenerable from that jar with the decompilers in
-`tools/`, e.g.:
-
-```sh
-java -jar tools/vineflower-1.11.1.jar reference/ec-original.jar decompiled-vineflower
-```
-
-`reference/`, `tools/`, and `build/` are gitignored.
