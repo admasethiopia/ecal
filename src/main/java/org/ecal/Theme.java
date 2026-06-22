@@ -33,7 +33,10 @@ final class Theme {
     static void installLookAndFeel() {
         System.setProperty("awt.useSystemAAFontSettings", "on");
         System.setProperty("swing.aatext", "true");
-        FlatLightLaf.setup();
+        // A FlatLaf failure must never block startup; fall back to the default L&F.
+        if (!FlatLightLaf.setup()) {
+            return;
+        }
         // Tuned defaults for a softer, modern flat look.
         UIManager.put("Component.accentColor", ACCENT);
         UIManager.put("Button.arc", 999);
