@@ -1,0 +1,14 @@
+# Build output
+build/
+*.class
+
+# Decompiler tooling and reference artifacts (regenerable from reference/ec-original.jar)
+tools/
+reference/
+decompiled*/
+*.jar
+
+# Local editor / agent settings
+.claude/settings.local.json
+.codex/
+.agents/
